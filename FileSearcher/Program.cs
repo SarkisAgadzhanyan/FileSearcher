@@ -205,15 +205,16 @@ namespace FileSearcher
         public static string GetRelativePathToFile(string filePath, string rootDirectory)
         {
             string relativePathToFile = "";
-            if (filePath.Length != rootDirectory.Length)
+            int rootDirectoryLength = rootDirectory.Length;
+            if (filePath.Length != rootDirectoryLength)
             {
-                if (filePath[rootDirectory.Length].ToString() != "\\")
+                if (filePath[rootDirectoryLength].ToString() != "\\")
                 {
-                    relativePathToFile = filePath.Substring(rootDirectory.Length);
+                    relativePathToFile = filePath.Substring(rootDirectoryLength);
                 }
                 else
                 {
-                    relativePathToFile = filePath.Substring(rootDirectory.Length+1);
+                    relativePathToFile = filePath.Substring(rootDirectoryLength + 1);
                 }
             }
             return relativePathToFile;
