@@ -161,7 +161,7 @@ namespace FileSearcher
 
         private void tbx_TextChanged(object sender, EventArgs e)
         {
-            if (tbx.Text != "")
+            if (tbx.Text != "" && !backgroundWorker1.IsBusy)
             {
                 start_btn.Enabled = true;
             }

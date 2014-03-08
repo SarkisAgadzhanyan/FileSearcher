@@ -81,7 +81,7 @@ namespace FileSearcher
                     }
                     else
                     {
-                        System.Threading.Thread.Sleep(100);
+                        System.Threading.Thread.Sleep(50);
                         if (bgrnd_worker.CancellationPending)
                         {
                             return;
@@ -110,7 +110,7 @@ namespace FileSearcher
                         {
                             ReportFile(bgrnd_worker, file); //сообщить о текущем файле
 
-                            System.Threading.Thread.Sleep(100);
+                            System.Threading.Thread.Sleep(50);
 
                             int fileNameStartIndex = 1 + file.LastIndexOf("\\");// индекс первого символа имени файла
 
@@ -207,7 +207,14 @@ namespace FileSearcher
             string relativePathToFile = "";
             if (filePath.Length != rootDirectory.Length)
             {
-                relativePathToFile = filePath.Substring(rootDirectory.Length + 1);
+                if (filePath[rootDirectory.Length].ToString() != "\\")
+                {
+                    relativePathToFile = filePath.Substring(rootDirectory.Length);
+                }
+                else
+                {
+                    relativePathToFile = filePath.Substring(rootDirectory.Length+1);
+                }
             }
             return relativePathToFile;
         }
