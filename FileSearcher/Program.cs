@@ -38,16 +38,20 @@ namespace FileSearcher
             }
             else
             {
-                SearchFileInCurrentDirectory(rootDirectory, filter, bgrnd_worker); // искать файлы в текущей директории (меняется рекурсивно)
-                string[] directories = Directory.GetDirectories(rootDirectory); //все директории, находящиеся, непосредственно, в корновой директории rootDirectory(меняется рекурсивно)
-
-                if (directories.Length != 0)
+                try
                 {
-                    foreach (string directory in directories)//для каждой директории, находящейся в текущей директории(rootDirectory),
+                    SearchFileInCurrentDirectory(rootDirectory, filter, bgrnd_worker); // искать файлы в текущей директории (меняется рекурсивно)
+                    string[] directories = Directory.GetDirectories(rootDirectory); //все директории, находящиеся, непосредственно, в корновой директории rootDirectory(меняется рекурсивно)
+
+                    if (directories.Length != 0)
                     {
-                        SearchFile(directory, bgrnd_worker, filter);//искать вложенные директории директории
+                        foreach (string directory in directories)//для каждой директории, находящейся в текущей директории(rootDirectory),
+                        {
+                            SearchFile(directory, bgrnd_worker, filter);//искать вложенные директории директории
+                        }
                     }
                 }
+                catch { }
             }
         }
 
@@ -92,49 +96,53 @@ namespace FileSearcher
             }
             else // поиск фильтра в имени или тексте(для .txt) файла
             {
-                detectedFiles = Directory.GetFiles(directory); // все файлы, находящиеся в папке directory
-
-                foreach (string file in detectedFiles)
+                try
                 {
-                    if (bgrnd_worker.CancellationPending)
+                    detectedFiles = Directory.GetFiles(directory); // все файлы, находящиеся в папке directory
+
+                    foreach (string file in detectedFiles)
                     {
-                        return;
-                    }
-                    else
-                    {
-                        ReportFile(bgrnd_worker, file); //сообщить о текущем файле
-
-                        System.Threading.Thread.Sleep(100);
-
-                        int fileNameStartIndex = 1 + file.LastIndexOf("\\");// индекс первого символа имени файла
-
-                        string fileName = file.Substring(fileNameStartIndex);
-
-                        if (fileName.IndexOf(filter) > -1) // если имя файла содержит фильтр
+                        if (bgrnd_worker.CancellationPending)
                         {
-                            ReportFile(bgrnd_worker, file); // сообщить о текущем файле
+                            return;
                         }
-                        else // имя файла не содержит фильтр
+                        else
                         {
-                            if (fileName.IndexOf(".txt") > -1) // имя файла содержит .txt (текстовый файл?)
+                            ReportFile(bgrnd_worker, file); //сообщить о текущем файле
+
+                            System.Threading.Thread.Sleep(100);
+
+                            int fileNameStartIndex = 1 + file.LastIndexOf("\\");// индекс первого символа имени файла
+
+                            string fileName = file.Substring(fileNameStartIndex);
+
+                            if (fileName.IndexOf(filter) > -1) // если имя файла содержит фильтр
                             {
-                                try
+                                ReportFile(bgrnd_worker, file); // сообщить о текущем файле
+                            }
+                            else // имя файла не содержит фильтр
+                            {
+                                if (fileName.IndexOf(".txt") > -1) // имя файла содержит .txt (текстовый файл?)
                                 {
-                                    FileStream fs = new FileStream(file, FileMode.Open);
-                                    StreamReader sr = new StreamReader(fs, Encoding.Default);
-                                    string line = sr.ReadToEnd();
-                                    fs.Position = 0;
-                                    if (line.IndexOf(filter) > -1) // содержание файла содержит фильтр
+                                    try
                                     {
-                                        ReportFile(bgrnd_worker, file); //сообщить о текущем файле
+                                        FileStream fs = new FileStream(file, FileMode.Open);
+                                        StreamReader sr = new StreamReader(fs, Encoding.Default);
+                                        string line = sr.ReadToEnd();
+                                        fs.Position = 0;
+                                        if (line.IndexOf(filter) > -1) // содержание файла содержит фильтр
+                                        {
+                                            ReportFile(bgrnd_worker, file); //сообщить о текущем файле
+                                        }
+                                        fs.Close();
                                     }
-                                    fs.Close();
+                                    catch { }
                                 }
-                                catch { }
                             }
                         }
                     }
                 }
+                catch { }
             }
         }
 
